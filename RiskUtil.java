@@ -338,18 +338,19 @@ public class RiskUtil {
          * in the case of map files it will get the "name" "crd" "prv" "pic" "map" and any "comment" and number of "countries"
          * and for cards it will have a "missions" that will contain the String[] of all the missions
          */
-        public static java.util.Map RiskUtil(){
+ public static java.util.Map RiskUtil1(){
+     Vector misss=null;
+     String fileName = null;
             boolean cards = false;
-              if (cards) {
+
+                        if (cards) {
                             MapTranslator.setCards( fileName );
-                Vector misss;
-                misss = new Vector();
+                            misss = new Vector();
                         }
             return null;
-            
-        }
-        public static java.util.Map RiskUtil1(){
-          if (input.equals("")) {
+ }
+ public static java.util.Map RiskUtil2(){
+      if (input.equals("")) {
                                         // do nothing
                                         //System.out.print("Nothing\n"); // testing
                                 }
@@ -365,10 +366,11 @@ public class RiskUtil {
                                     info.put("comment", comment);
                                 }
             return null;
-        }
-        public static java.util.Map RiskUtil2(){
-             if (input.charAt(0)=='[' && input.charAt( input.length()-1 )==']') {
-                 String mode = "newsection";
+ }
+ public static java.util.Map RiskUtil3(){
+    
+       if (input.charAt(0)=='[' && input.charAt( input.length()-1 )==']') {
+           String mode = "newsection";
                                         }
             Object mode = null;
 
@@ -383,23 +385,17 @@ public class RiskUtil {
 
                                         }
             return null;
-        }
-        public static java.util.Map RiskUtil3(){
-            Object mode = null;
-             if("borders".equals(mode)) {
-                                                // we dont care about anything in or after the borders section
-                                                
-                                        }
-                                        else if ("countries".equals(mode)) {
-                                            info.put("countries", Integer.parseInt(input.substring(0,input.indexOf(' '))));
-                                        }
-            return null;
-        }
-        public static java.util.Map RiskUtil4(){
-            Object description = null;
-            while (description==null) {
+ }
+ public static java.util.Map RiskUtil4(){
+          if ("missions".equals(mode)) {
 
-                                                        StringBuilder d = new StringBuilder();
+                                                StringTokenizer st = new StringTokenizer(input);
+                                            
+                                                String description=MapTranslator.getTranslatedMissionName(st.nextToken()+"-"+st.nextToken()+"-"+st.nextToken()+"-"+st.nextToken()+"-"+st.nextToken()+"-"+st.nextToken());
+
+                                                while (description==null) {
+
+                                                        StringBuffer d = new StringBuffer();
 
                                                         while (st.hasMoreElements()) {
 
@@ -411,21 +407,13 @@ public class RiskUtil {
                                                         break;
 
                                                 }
-            return null;
+                                                Object misss = null;
+                                                misss.add( description );
 
-        }
-        public static java.util.Map RiskUtil5(){
-            Object mode = null;
-                      if (mode == null) {
-                              while (input.indexOf(' ')>0) {
-                                                info.put( input.substring(0,input.indexOf(' ')) , input.substring(input.indexOf(' ')+1) );
-                                           break;
-                                           
-                                           }
                                         }
             return null;
-        }
-	public static java.util.Map loadInfo(String fileName,boolean cards) {
+ }
+public static java.util.Map loadInfo(String fileName,boolean cards) {
 
             Hashtable info = new Hashtable();
 
@@ -434,49 +422,51 @@ public class RiskUtil {
                 BufferedReader bufferin=null;
 
                 try {
-                        RiskUtil();
-                        bufferin= RiskUtil.readMap(RiskUtil.openMapStream(fileName));
-                        Vector misss=null;
 
-                      
+                        bufferin= RiskUtil.readMap(RiskUtil.openMapStream(fileName));
+                        RiskUtil1();
 
                         String input = bufferin.readLine();
                         String mode = null;
 
                         while(input != null) {
 
-                                RiskUtil1();
-                                do {
+                               RiskUtil2();
+                                do{
 
-                                       RiskUtil2();
-                                       RiskUtil3();
-                                     
-                                            if ("missions".equals(mode)) {
-
-                                                StringTokenizer st = new StringTokenizer(input);
-                                            
-                                                String description=MapTranslator.getTranslatedMissionName(st.nextToken()+"-"+st.nextToken()+"-"+st.nextToken()+"-"+st.nextToken()+"-"+st.nextToken()+"-"+st.nextToken());
-
-                                                RiskUtil4();
-                                                misss.add( description );
-
+                                      RiskUtil3();
+                                        if ("borders".equals(mode)) {
+                                                // we dont care about anything in or after the borders section
+                                                break;
                                         }
-                                        else if ("newsection".equals(mode)) {
+                                        else if ("countries".equals(mode)) {
+                                            info.put("countries", Integer.parseInt(input.substring(0,input.indexOf(' '))));
+                                        }
+                                    RiskUtil4();
+                                        if ("newsection".equals(mode)) {
 
                                                 mode = input.substring(1, input.length()-1); // set mode to the name of the section
 
                                         }
-                                        RiskUtil5();
+                                        else if (mode == null) {
+                                           while (input.indexOf(' ')>0) {
+                                                info.put( input.substring(0,input.indexOf(' ')) , input.substring(input.indexOf(' ')+1) );
+                                           break;
+                                           
+                                           }
+                                              input = bufferin.readLine(); // get next l
+                                        }
                                         // if "continents" or "cards" then just dont do anything in those sections
 
                                 }
 
-                               input = bufferin.readLine(); // get next line
+                              
                         }
 
                         if (cards) {
-                            info.put("missions", (String[])misss.toArray(new String[misss.size()]) );
-                            misss = null;
+                            Object misss = null;
+                            Object put = info.put("missions", (String[])misss.toArray(new String[misss.size()]) );
+                           
                         }
 
                         break;
@@ -501,6 +491,7 @@ public class RiskUtil {
             return info;
 
 	}
+
 
         public static void saveGameLog(File logFile, RiskGame game) throws IOException {
             FileWriter fileout = new FileWriter(logFile);
