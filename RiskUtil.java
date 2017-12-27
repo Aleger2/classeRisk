@@ -387,7 +387,9 @@ public class RiskUtil {
             return null;
  }
  public static java.util.Map RiskUtil4(){
+            Object mode = null;
           if ("missions".equals(mode)) {
+                String input = null;
 
                                                 StringTokenizer st = new StringTokenizer(input);
                                             
@@ -432,7 +434,7 @@ public static java.util.Map loadInfo(String fileName,boolean cards) {
                         while(input != null) {
 
                                RiskUtil2();
-                                do{
+                               else{
 
                                       RiskUtil3();
                                         if ("borders".equals(mode)) {
