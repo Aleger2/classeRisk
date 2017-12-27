@@ -121,30 +121,23 @@ public class RiskUtil {
          *   choosemap luca.map
          *   startgame domination increasing
          */
-        public static String GameString(){
-            int gameMode = 0;
-              switch(gameMode) {
+        public static String createGameString(int easyAI, int averageAI, int hardAI, int gameMode, int cardsMode, boolean AutoPlaceAll, boolean recycle, String mapFile) {
+
+            String players = averageAI + "\n" + easyAI + "\n" + hardAI + "\n";
+
+            String type="";
+
+            switch(gameMode) {
                 case RiskGame.MODE_DOMINATION: type = "domination"; break;
                 case RiskGame.MODE_CAPITAL: type = "capital"; break;
                 case RiskGame.MODE_SECRET_MISSION: type = "mission"; break;
             }
-            int cardsMode = 0;
             
             switch(cardsMode) {
                 case RiskGame.CARD_INCREASING_SET: type += " increasing"; break;
                 case RiskGame.CARD_FIXED_SET: type += " fixed"; break;
                 case RiskGame.CARD_ITALIANLIKE_SET: type += " italianlike"; break;
             }
-            return null;
-            
-        }
-        public static String createGameString(int easyAI, int averageAI, int hardAI, int gameMode, int cardsMode, boolean AutoPlaceAll, boolean recycle, String mapFile) {
-
-            String players = averageAI + "\n" + easyAI + "\n" + hardAI + "\n";
-
-            String type="";
-              GameString();
-          
 
             if ( AutoPlaceAll ) type += " autoplaceall";
             if ( recycle ) type += " recycle";
@@ -338,19 +331,30 @@ public class RiskUtil {
          * in the case of map files it will get the "name" "crd" "prv" "pic" "map" and any "comment" and number of "countries"
          * and for cards it will have a "missions" that will contain the String[] of all the missions
          */
- public static java.util.Map RiskUtil1(){
-     Vector misss=null;
-     String fileName = null;
-            boolean cards = false;
+	public static java.util.Map loadInfo(String fileName,boolean cards) {
+
+            Hashtable info = new Hashtable();
+
+            for (int c=0;true;c++) {
+
+                BufferedReader bufferin=null;
+
+                try {
+
+                        bufferin= RiskUtil.readMap(RiskUtil.openMapStream(fileName));
+                        Vector misss=null;
 
                         if (cards) {
                             MapTranslator.setCards( fileName );
                             misss = new Vector();
                         }
-            return null;
- }
- public static java.util.Map RiskUtil2(){
-      if (input.equals("")) {
+
+                        String input = bufferin.readLine();
+                        String mode = null;
+
+                        while(input != null) {
+
+                                if (input.equals("")) {
                                         // do nothing
                                         //System.out.print("Nothing\n"); // testing
                                 }
@@ -365,14 +369,11 @@ public class RiskUtil {
                                     }
                                     info.put("comment", comment);
                                 }
-            return null;
- }
- public static java.util.Map RiskUtil3(){
-    
-       if (input.charAt(0)=='[' && input.charAt( input.length()-1 )==']') {
-           String mode = "newsection";
+                                else {
+
+                                        if (input.charAt(0)=='[' && input.charAt( input.length()-1 )==']') {
+                                                mode="newsection";
                                         }
-            Object mode = null;
 
                                         if ("files".equals(mode)) {
 
@@ -384,12 +385,14 @@ public class RiskUtil {
                                                 info.put( fm , val);
 
                                         }
-            return null;
- }
- public static java.util.Map RiskUtil4(){
-            Object mode = null;
-          if ("missions".equals(mode)) {
-                String input = null;
+                                        else if ("borders".equals(mode)) {
+                                                // we dont care about anything in or after the borders section
+                                                break;
+                                        }
+                                        else if ("countries".equals(mode)) {
+                                            info.put("countries", Integer.parseInt(input.substring(0,input.indexOf(' '))));
+                                        }
+                                        else if ("missions".equals(mode)) {
 
                                                 StringTokenizer st = new StringTokenizer(input);
                                             
@@ -409,43 +412,11 @@ public class RiskUtil {
                                                         break;
 
                                                 }
-                                                Object misss = null;
+
                                                 misss.add( description );
 
                                         }
-            return null;
- }
-public static java.util.Map loadInfo(String fileName,boolean cards) {
-
-            Hashtable info = new Hashtable();
-
-            for (int c=0;true;c++) {
-
-                BufferedReader bufferin=null;
-
-                try {
-
-                        bufferin= RiskUtil.readMap(RiskUtil.openMapStream(fileName));
-                        RiskUtil1();
-
-                        String input = bufferin.readLine();
-                        String mode = null;
-
-                        while(input != null) {
-
-                               RiskUtil2();
-                               else{
-
-                                      RiskUtil3();
-                                        if ("borders".equals(mode)) {
-                                                // we dont care about anything in or after the borders section
-                                                break;
-                                        }
-                                        else if ("countries".equals(mode)) {
-                                            info.put("countries", Integer.parseInt(input.substring(0,input.indexOf(' '))));
-                                        }
-                                    RiskUtil4();
-                                        if ("newsection".equals(mode)) {
+                                        else if ("newsection".equals(mode)) {
 
                                                 mode = input.substring(1, input.length()-1); // set mode to the name of the section
 
@@ -456,19 +427,17 @@ public static java.util.Map loadInfo(String fileName,boolean cards) {
                                            break;
                                            
                                            }
-                                              input = bufferin.readLine(); // get next l
                                         }
                                         // if "continents" or "cards" then just dont do anything in those sections
 
                                 }
 
-                              
+                                input = bufferin.readLine(); // get next line
                         }
 
                         if (cards) {
-                            Object misss = null;
-                            Object put = info.put("missions", (String[])misss.toArray(new String[misss.size()]) );
-                           
+                            info.put("missions", (String[])misss.toArray(new String[misss.size()]) );
+                            misss = null;
                         }
 
                         break;
@@ -493,7 +462,6 @@ public static java.util.Map loadInfo(String fileName,boolean cards) {
             return info;
 
 	}
-
 
         public static void saveGameLog(File logFile, RiskGame game) throws IOException {
             FileWriter fileout = new FileWriter(logFile);
